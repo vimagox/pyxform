@@ -1,3 +1,4 @@
+from urllib2 import urlopen
 from xml.dom.minidom import Text, Element, parseString
 import re
 import codecs
@@ -18,7 +19,7 @@ else:
         unicode = unicode
         basestring = basestring
         unichr = unichr
-     except NameError:# special cases where unicode is defined in python3 
+     except NameError:# special cases where unicode is defined in python3
         unicode = str
         basestring = str
         unichr = chr
@@ -148,9 +149,14 @@ def flatten(li):
         for it in subli:
             yield it
 
+def open_workbook(path):
+    if path.startswith('http'):
+        filecontent = urlopen(path).read()
+        return xlrd.open_workbook(file_content=filecontent)
+    return xlrd.open_workbook(path)
 
 def sheet_to_csv(workbook_path, csv_path, sheet_name):
-    wb = xlrd.open_workbook(workbook_path)
+    wb = open_workbook(workbook_path)
     try:
         sheet = wb.sheet_by_name(sheet_name)
     except xlrd.biffh.XLRDError:
